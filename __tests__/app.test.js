@@ -70,4 +70,59 @@ describe("/api/reviews/:review_id", () => {
             });
         });
     });
+    describe("PATCH", () => {
+        test("Status: 201. Responds with a review object with the vote property updated by the input value", () => {
+            const voteUpdate = { inc_votes: 5 };
+            return request(app)
+            .patch("/api/reviews/2")
+            .send(voteUpdate)
+            .expect(201)
+            .then(({ body }) => {
+                const { review } = body;
+                expect(review).toBeInstanceOf(Object);
+                expect(Object.keys(review).length).toBe(9);
+                expect(review.review_votes).toBe(10);
+            });
+        });
+        test("Status: 404. Responds with an error message when the path is logical but does not exist", () => {
+            const voteUpdate = { inc_votes: 5 };
+            return request(app)
+            .patch("/api/reviews/9999")
+            .send(voteUpdate)
+            .expect(404)
+            .then(({ body }) => {
+                expect(body.msg).toBe("Review not found.");
+            });
+        });
+        test("Status: 400. Responds with an error message when the path is illogical", () => {
+            const voteUpdate = { inc_votes: 5 };
+            return request(app)
+            .patch("/api/reviews/not-a-number")
+            .send(voteUpdate)
+            .expect(400)
+            .then(({ body }) => {
+                expect(body.msg).toBe("Invalid data entry.");
+            });
+        });
+        test("Status: 400. Responds with an error message when the patch request is an empty object", () => {
+            const voteUpdate = {};
+            return request(app)
+            .patch("/api/reviews/2")
+            .send(voteUpdate)
+            .expect(400)
+            .then(({ body }) => {
+                expect(body.msg).toBe("Invalid patch object.");
+            });
+        });
+        test("Status: 400. Responds with an error message when the patch request is of the wrong input type", () => {
+            const voteUpdate = { inc_votes: "five"};
+            return request(app)
+            .patch("/api/reviews/2")
+            .send(voteUpdate)
+            .expect(400)
+            .then(({ body }) => {
+                expect(body.msg).toBe("Invalid patch object.");
+            });
+        });
+    });
 });
