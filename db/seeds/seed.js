@@ -3,10 +3,8 @@ const db = require("../");
 const format = require("pg-format");
 
 
-
 const seed = (data) => {
   const { categoryData, commentData, reviewData, userData } = data;
-
   return (
 
 //DROPS TABLES IF EXIST
@@ -41,8 +39,8 @@ const seed = (data) => {
           game_designer VARCHAR,
           game_category VARCHAR REFERENCES categories(category_slug),
           game_owner VARCHAR REFERENCES users(username),
-          review_votes INT NOT NULL DEFAULT 0,
-          review_created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP
+          review_votes INT DEFAULT 0,
+          review_created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
         );`);
       })
       .then(() => {
@@ -52,8 +50,8 @@ const seed = (data) => {
           comment_body TEXT NOT NULL,
           comment_author VARCHAR REFERENCES users(username),
           review_id INT REFERENCES reviews(review_id),
-          comment_votes INT NOT NULL DEFAULT 0,
-          comment_created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP
+          comment_votes INT DEFAULT 0,
+          comment_created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
         );`);
       })
 
@@ -90,6 +88,7 @@ const seed = (data) => {
         }));
         return (db.query(commentStr))
       })
+
 )};
 
 
