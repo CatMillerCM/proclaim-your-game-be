@@ -12,7 +12,6 @@ exports.getReviewById = (req, res, next) => {
 exports.patchReviewVotes = (req, res, next) => {
     const { review_id } = req.params;
     const update = req.body;
-    //const { inc_votes } = req.body;
     updateReviewVotes(review_id, update)
     .then((review) => {
         res.status(201).send({review});
@@ -21,7 +20,8 @@ exports.patchReviewVotes = (req, res, next) => {
 }
 
 exports.getReviews = (req, res, next) => {
-    selectReviews()
+    const { sort_by } = req.query;
+    selectReviews(sort_by)
     .then((reviews) => {
         res.status(200).send({ reviews });
     })

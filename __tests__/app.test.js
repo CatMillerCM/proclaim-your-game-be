@@ -149,11 +149,100 @@ describe("/api/reviews", () => {
                 expect(reviews.length).toBe(13);
                 reviews.forEach((reviewObj) => {
                     expect(reviewObj).toBeInstanceOf(Object);
-                    console.log(reviewObj);
                     expect(Object.keys(reviewObj).length).toBe(8);
                     expect(reviewObj.hasOwnProperty("comment_count")).toBe(true);
                 });
             });
         });
+        test("Status: 200. Responds with an array of review objects sorted by review creation date by default", () => {
+            return request(app)
+            .get("/api/reviews")
+            .expect(200)
+            .then(({ body }) => {
+                const { reviews } = body;
+                expect(body.reviews).toBeSortedBy("review_created_at");
+            });
+        });
+        test("Status: 200. Responds with an array of review objects sorted by review creation date when input as a valid query", () => {
+            return request(app)
+            .get("/api/reviews?sort_by=review_created_at")
+            .expect(200)
+            .then(({ body }) => {
+                expect(body.reviews).toBeSortedBy("review_created_at");
+            });
+        });
+        test("Status: 200. Responds with an array of review objects sorted by game owner username when input as a valid query", () => {
+            return request(app)
+            .get("/api/reviews?sort_by=game_owner")
+            .expect(200)
+            .then(({ body }) => {
+                expect(body.reviews).toBeSortedBy("game_owner");
+            });
+        });
+        test("Status: 200. Responds with an array of review objects sorted by review title when input as a valid query", () => {
+            return request(app)
+            .get("/api/reviews?sort_by=review_title")
+            .expect(200)
+            .then(({ body }) => {
+                expect(body.reviews).toBeSortedBy("review_title");
+            });
+        });
+        test("Status: 200. Responds with an array of review objects sorted by review id when input as a valid query", () => {
+            return request(app)
+            .get("/api/reviews?sort_by=review_id")
+            .expect(200)
+            .then(({ body }) => {
+                expect(body.reviews).toBeSortedBy("review_id");
+            });
+        });
+        test("Status: 200. Responds with an array of review objects sorted by review game category when input as a valid query", () => {
+            return request(app)
+            .get("/api/reviews?sort_by=game_category")
+            .expect(200)
+            .then(({ body }) => {
+                expect(body.reviews).toBeSortedBy("game_category");
+            });
+        });
+        test("Status: 200. Responds with an array of review objects sorted by review image url when input as a valid query", () => {
+            return request(app)
+            .get("/api/reviews?sort_by=review_img_url")
+            .expect(200)
+            .then(({ body }) => {
+                expect(body.reviews).toBeSortedBy("review_img_url");
+            });
+        });
+        test("Status: 200. Responds with an array of review objects sorted by review votes when input as a valid query", () => {
+            return request(app)
+            .get("/api/reviews?sort_by=review_votes")
+            .expect(200)
+            .then(({ body }) => {
+                expect(body.reviews).toBeSortedBy("review_votes");
+            });
+        });
+        test("Status: 200. Responds with an array of review objects sorted by comment count when input as a valid query", () => {
+            return request(app)
+            .get("/api/reviews?sort_by=comment_count")
+            .expect(200)
+            .then(({ body }) => {
+                expect(body.reviews).toBeSortedBy("comment_count");
+            });
+        });
+        test("Status: 400. Responds with an error message when the sort_by query is invalid", () => {
+            return request(app)
+            .get("/api/reviews?sort_by=invalid_query")
+            .expect(400)
+            .then(({ body }) => {
+                expect(body.msg).toBe("Invalid sort_by query.");
+            });
+        });
+        test("Status: 400. Responds with an error message when the sort_by query is of an incorrect data type", () => {
+            return request(app)
+            .get("/api/reviews?sort_by=123")
+            .expect(400)
+            .then(({ body }) => {
+                expect(body.msg).toBe("Invalid sort_by query.");
+            });
+        });
     });
 });
+

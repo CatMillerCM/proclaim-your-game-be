@@ -31,12 +31,15 @@ exports.updateReviewVotes = async (id, update) => {
     } return rows[0];
 }
 
-exports.selectReviews = async () => {
+exports.selectReviews = async (sort_by = "review_created_at") => {
+    if (!["review_id", "review_title", "review_img_url", "game_category", "game_owner", "review_votes", "review_created_at", "comment_count"].includes(sort_by)) {
+        return Promise.reject({ status: 400, msg: "Invalid sort_by query." });
+    }
     const { rows } = await db.query(`SELECT reviews.review_id, reviews.review_title, reviews.review_img_url, reviews.game_category, reviews.game_owner, reviews.review_votes, reviews.review_created_at, COUNT(comments.review_id) AS comment_count 
     FROM reviews 
     LEFT JOIN comments
     ON reviews.review_id = comments.review_id 
-    GROUP BY reviews.review_id;`)
-    console.log(rows);
+    GROUP BY reviews.review_id 
+    ORDER BY ${sort_by} ASC;`)
     return rows;
 };
