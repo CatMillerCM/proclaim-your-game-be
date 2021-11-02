@@ -55,15 +55,17 @@ exports.selectReviews = async (sort_by = "review_created_at", order = "desc", ga
     ORDER BY ${sort_by} ${order};`
 
     const { rows } = await db.query(queryStr, queryValues);
+
+    if (rows.length === 0) {
+        const categoryResult = await db.query(`
+        SELECT * FROM categories WHERE category_slug = $1;`, [game_category]);
+
+        console.log(categoryResult.rows);
+
+        if (categoryResult.rows.length === 0) {
+            return Promise.reject({status: 400, msg: "No games match this category",
+            });
+        }
+    }
     return rows;
 };
-
-
-
-    // const { rows } = await db.query(`SELECT reviews.review_id, reviews.review_title, reviews.review_img_url, reviews.game_category, reviews.game_owner, reviews.review_votes, reviews.review_created_at, COUNT(comments.review_id) AS comment_count 
-    // FROM reviews 
-    // LEFT JOIN comments
-    // ON reviews.review_id = comments.review_id
-    // WHERE game_category = ${game_category}
-    // GROUP BY reviews.review_id 
-    // ORDER BY ${sort_by} ${order};`)

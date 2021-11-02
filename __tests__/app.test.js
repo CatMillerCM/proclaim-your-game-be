@@ -281,19 +281,22 @@ describe("/api/reviews", () => {
                 });
             });
         });
-        //NO GAMES
-        // test("status: 400, error message of invalid input", () => {
-        //     return request(app)
-        //     .get("/api/treasures?colour=not_a_colour")
-        //     .expect(400)
-        //     .then(({ body }) => {
-        //         expect(body.message).toBe("No items match this colour");
-        //     });
-        // });
+        test("Status: 400. Responds with an error message when the category query is not in the database", () => {
+            return request(app)
+            .get("/api/reviews?game_category=not_a_category")
+            .expect(400)
+            .then(({ body }) => {
+                expect(body.msg).toBe("No games match this category");
+            });
+        });
+        test("Status: 200. Responds with an error message when the category exists but contains no reviews", () => {
+            return request(app)
+            .get("/api/reviews?game_category=children's games")
+            .expect(200)
+            .then(({ body }) => {
+                expect(body.reviews).toEqual([]);
+            });
+        });
     });
 });
-
-
-// category that is not in the database
-// category that exists but does not have any reviews associated with it
 
