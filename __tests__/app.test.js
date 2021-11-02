@@ -124,5 +124,36 @@ describe("/api/reviews/:review_id", () => {
                 expect(body.msg).toBe("Invalid patch object.");
             });
         });
+        test("Status: 422. Responds with an error message when the patch request has another property on the body", () => {
+            const voteUpdate = { inc_votes: 1, name: "Mitch"};
+            return request(app)
+            .patch("/api/reviews/2")
+            .send(voteUpdate)
+            .expect(422)
+            .then(({ body }) => {
+                expect(body.msg).toBe("Invalid patch object.");
+            });
+        });
+    });
+});
+
+describe("/api/reviews", () => {
+    describe("GET", () => {
+        test("Status: 200. Responds with an array of review objects", () => {
+            return request(app)
+            .get("/api/reviews")
+            .expect(200)
+            .then(({ body }) => {
+                const { reviews } = body;
+                expect(reviews).toBeInstanceOf(Array);
+                expect(reviews.length).toBe(13);
+                reviews.forEach((reviewObj) => {
+                    expect(reviewObj).toBeInstanceOf(Object);
+                    console.log(reviewObj);
+                    expect(Object.keys(reviewObj).length).toBe(8);
+                    expect(reviewObj.hasOwnProperty("comment_count")).toBe(true);
+                });
+            });
+        });
     });
 });
