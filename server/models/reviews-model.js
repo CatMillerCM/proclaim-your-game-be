@@ -2,7 +2,7 @@ const db = require("../../db");
 
 exports.selectReviewById = async (id) => {
     const { rows } = await db.query(
-        `SELECT reviews.*, COUNT(comments.review_id) AS comment_count
+        `SELECT reviews.*, COUNT(comments.review_id)::INT AS comment_count
         FROM reviews 
         LEFT JOIN comments
         ON reviews.review_id = comments.review_id
@@ -41,7 +41,7 @@ exports.selectReviews = async (sort_by = "review_created_at", order = "desc", ga
 
     const queryValues = [];
 
-    let queryStr = `SELECT reviews.review_id, reviews.review_title, reviews.review_img_url, reviews.game_category, reviews.game_owner, reviews.review_votes, reviews.review_created_at, COUNT(comments.review_id) AS comment_count 
+    let queryStr = `SELECT reviews.review_id, reviews.review_title, reviews.review_img_url, reviews.game_category, reviews.game_owner, reviews.review_votes, reviews.review_created_at, COUNT(comments.review_id)::INT AS comment_count 
     FROM reviews 
     LEFT JOIN comments
     ON reviews.review_id = comments.review_id `
@@ -81,4 +81,39 @@ exports.selectCommentsByReview = async (id) => {
     FROM comments 
     WHERE review_id = $1;`, [id]);
     return rows;
+};
+
+exports.createComment = async (id, commentObj) => {
+
+    if (Object.keys(commentObj).length === 0) {
+        return Promise.reject({ status: 400, msg: "Invalid post object." });
+    }
+    
+    if (Object.keys(commentObj).length != 2) {
+        return Promise.reject({ status: 422, msg: "Invalid post object." });
+    }
+
+    const { author, body } = commentObj;
+
+    const reviews = await db.query(`SELECT * FROM reviews WHERE review_id = $1;`, [id]);
+    if (reviews.rows.length === 0) {
+        return Promise.reject({ status: 404, msg: "Review not found." });
+    }
+
+    if (typeof author != "string" || typeof body != "string") {
+        return Promise.reject({ status: 400, msg: "Invalid post object." });
+    }
+
+    const allUsers = await db.query(`SELECT username FROM users;`);
+    const usernameArray = allUsers.rows.map((user) => user.username);
+    if (!usernameArray.includes(author)) {
+        return Promise.reject({ status: 400, msg: "Invalid username." });
+    }
+
+    const { rows } = await db.query(`
+    INSERT INTO comments (comment_author, comment_body, comment_votes, review_id, comment_created_at) 
+    VALUES ($1, $2, 0, $3, CURRENT_TIMESTAMP) 
+    RETURNING *;`, [author, body, id]);
+
+    return rows[0];
 };

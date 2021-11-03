@@ -1,4 +1,4 @@
-const { selectReviewById, updateReviewVotes, selectReviews, selectCommentsByReview} = require("../models/reviews-model");
+const { selectReviewById, updateReviewVotes, selectReviews, selectCommentsByReview, createComment} = require("../models/reviews-model");
 
 exports.getReviewById = (req, res, next) => {
     const { review_id } = req.params;
@@ -38,3 +38,13 @@ exports.getCommentsByReview = (req, res, next) => {
     })
     .catch(next);
 };
+
+exports.postComment = (req, res, next) => {
+    const { review_id } = req.params;
+    const commentObj = req.body;
+    createComment(review_id, commentObj)
+    .then((comment) => {
+        res.status(201).send({ comment });
+    })
+    .catch(next);
+}

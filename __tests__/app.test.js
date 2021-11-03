@@ -50,7 +50,7 @@ describe("/api/reviews/:review_id", () => {
                 const { review } = body;
                 expect(review).toBeInstanceOf(Object);
                 expect(Object.keys(review).length).toBe(10);
-                expect(review.comment_count).toBe("3");
+                expect(review.comment_count).toBe(3);
             });
         });
         test("Status: 404. Responds with an error message when the path is logical but does not exist", () => {
@@ -338,6 +338,102 @@ describe("/api/reviews/:review_id/comments", () => {
             .expect(200)
             .then(({ body }) => {
                 expect(body.comments).toEqual([]);
+            });
+        });
+    });
+    describe("POST", () => {
+        test("Status: 201. Responds with a comment object with the relevant properties", () => {
+            const newComment = {author: 'philippaclaire9', body: 'Great fun for the fam!'}
+            return request(app)
+            .post("/api/reviews/2/comments")
+            .send(newComment)
+            .expect(201)
+            .then(({ body }) => {
+                const { comment } = body;
+                expect(comment).toBeInstanceOf(Object);
+                expect(Object.keys(comment).length).toBe(6);
+                expect(comment.comment_author).toEqual('philippaclaire9');
+                expect(comment.comment_body).toEqual('Great fun for the fam!')
+            });
+        });
+        test("Status: 404. Responds with an error message when the review id is logical but does not exist", () => {
+            const newComment = {author: 'philippaclaire9', body: 'Great fun for the fam!'}
+            return request(app)
+            .post("/api/reviews/9999/comments")
+            .send(newComment)
+            .expect(404)
+            .then(({ body }) => {
+                expect(body.msg).toBe("Review not found.");
+            });
+        });
+        test("Status: 400. Responds with an error message when the review id is illogical", () => {
+            const newComment = {author: 'philippaclaire9', body: 'Great fun for the fam!'}
+            return request(app)
+            .post("/api/reviews/not-a-number/comments")
+            .send(newComment)
+            .expect(400)
+            .then(({ body }) => {
+                expect(body.msg).toBe("Invalid data entry.");
+            });
+        });
+        test("Status: 400. Responds with an error message when the comment post request is an empty object", () => {
+            const newComment = {};
+            return request(app)
+            .post("/api/reviews/2/comments")
+            .send(newComment)
+            .expect(400)
+            .then(({ body }) => {
+                expect(body.msg).toBe("Invalid post object.");
+            });
+        });
+        test("Status: 400. Responds with an error message when the post request contains the wrong body data type", () => {
+            const newComment = {author: 'philippaclaire9', body: 5};
+            return request(app)
+            .post("/api/reviews/2/comments")
+            .send(newComment)
+            .expect(400)
+            .then(({ body }) => {
+                expect(body.msg).toBe("Invalid post object.");
+            });
+        });
+        test("Status: 400. Responds with an error message when the post request contains the wrong author data type", () => {
+            const newComment = {author: 15, body: 'Great fun for the fam!'}
+            return request(app)
+            .post("/api/reviews/2/comments")
+            .send(newComment)
+            .expect(400)
+            .then(({ body }) => {
+                expect(body.msg).toBe("Invalid post object.");
+            });
+        });
+        test("Status: 400. Responds with an error message when the post request specifies a username that does not exist", () => {
+            const newComment = {author: 'user-does-not-exist', body: 'Great fun for the fam!'}
+            return request(app)
+            .post("/api/reviews/2/comments")
+            .send(newComment)
+            .expect(400)
+            .then(({ body }) => {
+                expect(body.msg).toBe("Invalid username.");
+            });
+        });
+        test("Status: 422. Responds with an error message when the post request has another property", () => {
+            const newComment = {author: 'philippaclaire9', body: 'Great fun for the fam!', votes: 8}
+            return request(app)
+            .post("/api/reviews/2/comments")
+            .send(newComment)
+            .expect(422)
+            .then(({ body }) => {
+                expect(body.msg).toBe("Invalid post object.");
+            });
+        });
+        test("Status: 422. Responds with an error message when the post request does not have both properties", () => {
+            const newComment = {author: 'philippaclaire9'}
+            return request(app)
+            .post("/api/reviews/2/comments")
+            .send(newComment)
+            .expect(422)
+            .then(({ body }) => {
+                expect(body.msg).toBe("Invalid post object.");
             });
         });
     });
