@@ -289,7 +289,7 @@ describe("/api/reviews", () => {
                 expect(body.msg).toBe("No games match this category");
             });
         });
-        test("Status: 200. Responds with an error message when the category exists but contains no reviews", () => {
+        test("Status: 200. Responds with an empty array when the category exists but contains no reviews", () => {
             return request(app)
             .get("/api/reviews?game_category=children's games")
             .expect(200)
@@ -300,3 +300,45 @@ describe("/api/reviews", () => {
     });
 });
 
+describe("/api/reviews/:review_id/comments", () => {
+    describe("GET", () => {
+        test("Status: 200. Responds with an array of comments for the given review id with the relevant properties", () => {
+            return request(app)
+            .get("/api/reviews/2/comments")
+            .expect(200)
+            .then(({ body }) => {
+                const { comments } = body;
+                expect(comments).toBeInstanceOf(Array);
+                expect(comments.length).toBe(3);
+                comments.forEach((commentObj) => {
+                    expect(commentObj).toBeInstanceOf(Object);
+                    expect(Object.keys(commentObj).length).toBe(5);
+                });
+            });
+        });
+        test("Status: 404. Responds with an error message when the review id is logical but does not exist", () => {
+            return request(app)
+            .get("/api/reviews/9999/comments")
+            .expect(404)
+            .then(({ body }) => {
+                expect(body.msg).toBe("Review not found.");
+            });
+        });
+        test("Status: 400. Responds with an error message when the review id is illogical", () => {
+            return request(app)
+            .get("/api/reviews/not-a-number/comments")
+            .expect(400)
+            .then(({ body }) => {
+                expect(body.msg).toBe("Invalid data entry.");
+            });
+        });
+        test("Status: 200. Responds with an empty array when the review id exists but has no associated comments", () => {
+            return request(app)
+            .get("/api/reviews/1/comments")
+            .expect(200)
+            .then(({ body }) => {
+                expect(body.comments).toEqual([]);
+            });
+        });
+    });
+});

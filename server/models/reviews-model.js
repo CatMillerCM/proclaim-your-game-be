@@ -60,12 +60,25 @@ exports.selectReviews = async (sort_by = "review_created_at", order = "desc", ga
         const categoryResult = await db.query(`
         SELECT * FROM categories WHERE category_slug = $1;`, [game_category]);
 
-        console.log(categoryResult.rows);
 
         if (categoryResult.rows.length === 0) {
             return Promise.reject({status: 400, msg: "No games match this category",
             });
         }
     }
+    return rows;
+};
+
+
+exports.selectCommentsByReview = async (id) => {
+    const reviews = await db.query(`SELECT * FROM reviews WHERE review_id = $1;`, [id])
+    
+    if (reviews.rows.length === 0) {
+        return Promise.reject({ status: 404, msg: "Review not found." });
+    }
+    const { rows } = await db.query(`
+    SELECT comment_id, comment_body, comment_author, comment_votes, comment_created_at 
+    FROM comments 
+    WHERE review_id = $1;`, [id]);
     return rows;
 };
