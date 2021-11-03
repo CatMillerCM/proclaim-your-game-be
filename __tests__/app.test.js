@@ -438,3 +438,37 @@ describe("/api/reviews/:review_id/comments", () => {
         });
     });
 });
+
+describe("/api/comments/:comment_id", () => {
+    describe("DELETE", () => {
+        test("Status: 204. Deletes the relevant comment and does not send any content back", () => {
+            return request(app)
+            .delete("/api/comments/2")
+            .expect(204)
+            .then(() => {
+                return request(app)
+                .get("/api/comments").expect(200)
+            })
+            .then(({ body }) => {
+                const { comments } = body;
+                expect(comments.length).toBe(5)
+            })
+        });
+        test("Status: 404. Responds with an error message when the path is logical but does not exist", () => {
+            return request(app)
+            .delete("/api/comments/9999")
+            .expect(404)
+            .then(({ body }) => {
+                expect(body.msg).toBe("Comment not found.");
+            });
+        });
+        test("Status: 400. Responds with an error message when the path is illogical", () => {
+            return request(app)
+            .delete("/api/comments/not-a-number")
+            .expect(400)
+            .then(({ body }) => {
+                expect(body.msg).toBe("Invalid data entry.");
+            });
+        });
+    });
+});
