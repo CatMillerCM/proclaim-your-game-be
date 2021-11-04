@@ -58,6 +58,17 @@ exports.getApi = (req, res) => {
 						]
 					}
 				},
+				"GET /api/users/:username": {
+					"description": "serves an object containing the associated user",
+					"queries": [],
+					"exampleResponse": {
+						"user": {
+						username: 'mallionaire',
+						name: 'haz',
+						avatar_url: 'https://www.healthytherapies.com/wp-content/uploads/2016/06/Lime3.jpg'
+						}
+					}
+				},
 				"GET /api/reviews/:review_id": {
 					"description": "serves an object containing the associated review",
 					"queries": [],

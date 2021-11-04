@@ -480,7 +480,7 @@ describe("/api", () => {
                 .get("/api")
                 .expect(200)
                 .then(({ body }) => {
-                    expect(Object.keys(body["Welcome to this API!"]["Here are the available endpoints:"]).length).toBe(10);
+                    expect(Object.keys(body["Welcome to this API!"]["Here are the available endpoints:"]).length).toBe(11);
                 });
         });
     });
@@ -501,6 +501,34 @@ describe("/api/users", () => {
                         username: expect.any(String)
                     }));
                 });
+            });
+        });
+    });
+});
+
+describe("/api/users/:username", () => {
+    describe("GET", () => {
+        test("Status: 200. Responds with a user object with the relevant properties", () => {
+            return request(app)
+            .get("/api/users/mallionaire")
+            .expect(200)
+            .then(({ body }) => {
+                const { user } = body;
+                expect(user).toBeInstanceOf(Object);
+                expect(Object.keys(user).length).toBe(3);
+                expect(user).toEqual({
+                    username: 'mallionaire',
+                    user_name: 'haz',
+                    user_avatar_url: 'https://www.healthytherapies.com/wp-content/uploads/2016/06/Lime3.jpg'
+                });
+            });
+        });
+        test("Status: 404. Responds with an error message when the username does not exist", () => {
+            return request(app)
+            .get("/api/users/undefined-username")
+            .expect(404)
+            .then(({ body }) => {
+                expect(body.msg).toBe("Username not found.");
             });
         });
     });

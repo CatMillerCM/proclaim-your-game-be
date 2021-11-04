@@ -41,7 +41,9 @@ Followed by:
 echo "PGDATABASE=DATABASE_NAME_HERE" > .env.development
 ```
 
-to populate this file with the associated database name.
+Here DATABASE_NAME_HERE refers to the databases outlined in the setup file that we will be accessing.
+
+This populates the file with the associated database name.
 
 Then create the test files in the same way:
 
