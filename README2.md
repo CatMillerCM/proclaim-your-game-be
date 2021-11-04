@@ -84,8 +84,8 @@ To run this project, you will need both Node.js and Postgres installed.
 
 The minimum versions required are:
 
-- Node.js 16.6.2
-- Postgress 8.7.1
+- Node.js 16+
+- Postgress 8+
 
 
 
