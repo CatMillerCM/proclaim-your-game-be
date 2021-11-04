@@ -471,6 +471,71 @@ describe("/api/comments/:comment_id", () => {
             });
         });
     });
+    describe("PATCH", () => {
+        test("Status: 201. Responds with a comment object with the vote property updated by the input value", () => {
+            const voteUpdate = { inc_votes: -2 };
+            return request(app)
+            .patch("/api/comments/3")
+            .send(voteUpdate)
+            .expect(201)
+            .then(({ body }) => {
+                const { comment } = body;
+                expect(comment).toBeInstanceOf(Object);
+                expect(Object.keys(comment).length).toBe(6);
+                expect(comment.comment_votes).toBe(8);
+            });
+        });
+        test("Status: 404. Responds with an error message when the path is logical but does not exist", () => {
+            const voteUpdate = { inc_votes: 5 };
+            return request(app)
+            .patch("/api/comments/9999")
+            .send(voteUpdate)
+            .expect(404)
+            .then(({ body }) => {
+                expect(body.msg).toBe("Comment not found.");
+            });
+        });
+        test("Status: 400. Responds with an error message when the path is illogical", () => {
+            const voteUpdate = { inc_votes: 5 };
+            return request(app)
+            .patch("/api/comments/not-a-number")
+            .send(voteUpdate)
+            .expect(400)
+            .then(({ body }) => {
+                expect(body.msg).toBe("Invalid data entry.");
+            });
+        });
+        test("Status: 400. Responds with an error message when the patch request is an empty object", () => {
+            const voteUpdate = {};
+            return request(app)
+            .patch("/api/comments/2")
+            .send(voteUpdate)
+            .expect(400)
+            .then(({ body }) => {
+                expect(body.msg).toBe("Invalid patch object.");
+            });
+        });
+        test("Status: 400. Responds with an error message when the patch request is of the wrong input type", () => {
+            const voteUpdate = { inc_votes: "five"};
+            return request(app)
+            .patch("/api/comments/2")
+            .send(voteUpdate)
+            .expect(400)
+            .then(({ body }) => {
+                expect(body.msg).toBe("Invalid patch object.");
+            });
+        });
+        test("Status: 422. Responds with an error message when the patch request has another property on the body", () => {
+            const voteUpdate = { inc_votes: 1, name: "Mitch"};
+            return request(app)
+            .patch("/api/comments/2")
+            .send(voteUpdate)
+            .expect(422)
+            .then(({ body }) => {
+                expect(body.msg).toBe("Invalid patch object.");
+            });
+        });
+    });
 });
 
 describe("/api", () => {
