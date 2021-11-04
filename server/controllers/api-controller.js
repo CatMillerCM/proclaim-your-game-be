@@ -137,6 +137,21 @@ exports.getApi = (req, res) => {
 				},
 				"DELETE /api/comments/:comment_id": {
 					"description": "deletes the specified comment",
+				},
+				"PATCH /api/comments/:comment_id": {
+					"description": "accepts a request body and serves an object containing the updated comment",
+					"requestBody": "{ inc_votes: newVote }",
+					"exampleRequestBody": "{ inc_votes: 5 }",
+					"exampleResponse": {
+						"comment": {
+							"comment_id": 3,
+							"body": "I didn't know dogs could play games",
+							"votes": 15,
+							"author": 'weegembump',
+							"review_id": 4,
+							"created_at": new Date(1610964588110),
+						}
+					}
 				}
 			}
 		}
