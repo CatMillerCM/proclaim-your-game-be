@@ -480,8 +480,28 @@ describe("/api", () => {
                 .get("/api")
                 .expect(200)
                 .then(({ body }) => {
-                    expect(Object.keys(body["Welcome to this API!"]["Here are the available endpoints:"]).length).toBe(9);
+                    expect(Object.keys(body["Welcome to this API!"]["Here are the available endpoints:"]).length).toBe(10);
                 });
+        });
+    });
+});
+
+describe("/api/users", () => {
+    describe("GET", () => {
+        test("Status: 200. Responds with an array of users' usernames", () => {
+            return request(app)
+            .get("/api/users")
+            .expect(200)
+            .then(({ body }) => {
+                const { users } = body;
+                expect(users).toBeInstanceOf(Array);
+                expect(users.length).toBe(4);
+                users.forEach((userObj) => {
+                    expect(userObj).toEqual(expect.objectContaining({
+                        username: expect.any(String)
+                    }));
+                });
+            });
         });
     });
 });

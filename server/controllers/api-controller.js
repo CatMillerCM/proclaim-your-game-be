@@ -17,6 +17,13 @@ exports.getApi = (req, res) => {
 						]
 					}
 				},
+				"GET /api/users": {
+					"description": "serves an array of all usernames",
+					"queries": [],
+					"exampleResponse": {
+						"users": [{"username": 'tickle122'}]
+					}
+				},
 				"GET /api/reviews": {
 					"description": "serves an array of all reviews",
 					"queries": ["category", "sort_by", "order"],
