@@ -20,10 +20,6 @@ exports.createComment = async (id, commentObj) => {
         return Promise.reject({ status: 400, msg: "Invalid post object." });
     }
     
-    if (Object.keys(commentObj).length != 2) {
-        return Promise.reject({ status: 422, msg: "Invalid post object." });
-    }
-
     const { author, body } = commentObj;
 
     const reviews = await db.query(`SELECT * FROM reviews WHERE review_id = $1;`, [id]);

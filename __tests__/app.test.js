@@ -535,6 +535,20 @@ describe("/api/reviews/:review_id/comments", () => {
                 expect(comment.body).toEqual('Great fun for the fam!')
             });
         });
+        test("Status: 201. Responds with a comment object with the relevant properties, ignoring unnecessary properties", () => {
+            const newComment = {author: 'philippaclaire9', body: 'Great fun for the fam!', votes: 8}
+            return request(app)
+            .post("/api/reviews/2/comments")
+            .send(newComment)
+            .expect(201)
+            .then(({ body }) => {
+                const { comment } = body;
+                expect(comment).toBeInstanceOf(Object);
+                expect(Object.keys(comment).length).toBe(6);
+                expect(comment.author).toEqual('philippaclaire9');
+                expect(comment.body).toEqual('Great fun for the fam!')
+            });
+        });
         test("Status: 404. Responds with an error message when the review id is logical but does not exist", () => {
             const newComment = {author: 'philippaclaire9', body: 'Great fun for the fam!'}
             return request(app)
@@ -593,16 +607,6 @@ describe("/api/reviews/:review_id/comments", () => {
             .expect(404)
             .then(({ body }) => {
                 expect(body.msg).toBe("Invalid username.");
-            });
-        });
-        test("Status: 422. Responds with an error message when the post request has another property", () => {
-            const newComment = {author: 'philippaclaire9', body: 'Great fun for the fam!', votes: 8}
-            return request(app)
-            .post("/api/reviews/2/comments")
-            .send(newComment)
-            .expect(422)
-            .then(({ body }) => {
-                expect(body.msg).toBe("Invalid post object.");
             });
         });
         test("Status: 400. Responds with an error message when the post request does not have both properties", () => {
