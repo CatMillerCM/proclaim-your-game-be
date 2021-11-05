@@ -14,7 +14,7 @@ exports.selectUserByUsername = async (username) => {
     }
 
     const { rows } = await db.query(`
-    SELECT username, user_name, user_avatar_url 
+    SELECT username, name, avatar_url 
     FROM users
     WHERE username = $1;`, [username])
 

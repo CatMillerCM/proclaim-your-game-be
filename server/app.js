@@ -1,5 +1,5 @@
 const express = require("express");
-const { notARoute, psqlErrors, customErrors, serverErrors } = require("./controllers/error-controller.js");
+const { handleInvalidRoute, handlePsqlErrors, handleCustomErrors, handleServerErrors } = require("./controllers/error-controller.js");
 const apiRouter = require("./routers/api-router.js");
 
 const app = express();
@@ -14,10 +14,10 @@ app.all("/*", (req, res) => {
     res.status(404).send({ msg: "Path not found." });
 });
 
-app.use(notARoute);
-app.use(psqlErrors);
-app.use(customErrors);
-app.use(serverErrors);
+app.use(handleInvalidRoute);
+app.use(handlePsqlErrors);
+app.use(handleCustomErrors);
+app.use(handleServerErrors);
 
 
 module.exports = app;

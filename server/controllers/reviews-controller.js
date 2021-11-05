@@ -22,8 +22,8 @@ exports.patchReviewVotes = (req, res, next) => {
 exports.getReviews = (req, res, next) => {
     const { sort_by } = req.query;
     const { order } = req.query;
-    const { game_category } = req.query;
-    selectReviews(sort_by, order, game_category)
+    const { category } = req.query;
+    selectReviews(sort_by, order, category)
     .then((reviews) => {
         res.status(200).send({ reviews });
     })

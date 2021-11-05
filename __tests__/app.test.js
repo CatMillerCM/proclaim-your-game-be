@@ -31,8 +31,8 @@ describe("/api/categories", () => {
                 expect(categories.length).toBe(4);
                 categories.forEach((categoryObj) => {
                     expect(categoryObj).toEqual(expect.objectContaining({
-                        category_description: expect.any(String),
-                        category_slug: expect.any(String)
+                        description: expect.any(String),
+                        slug: expect.any(String)
                     }));
                 });
             });
@@ -81,7 +81,7 @@ describe("/api/reviews/:review_id", () => {
                 const { review } = body;
                 expect(review).toBeInstanceOf(Object);
                 expect(Object.keys(review).length).toBe(9);
-                expect(review.review_votes).toBe(10);
+                expect(review.votes).toBe(10);
             });
         });
         test("Status: 404. Responds with an error message when the path is logical but does not exist", () => {
@@ -160,23 +160,23 @@ describe("/api/reviews", () => {
             .expect(200)
             .then(({ body }) => {
                 const { reviews } = body;
-                expect(body.reviews).toBeSortedBy("review_created_at", { descending: true });
+                expect(body.reviews).toBeSortedBy("created_at", { descending: true });
             });
         });
         test("Status: 200. Responds with an array of review objects sorted by review creation date descending when input as a valid query", () => {
             return request(app)
-            .get("/api/reviews?sort_by=review_created_at")
+            .get("/api/reviews?sort_by=created_at")
             .expect(200)
             .then(({ body }) => {
-                expect(body.reviews).toBeSortedBy("review_created_at", { descending: true });
+                expect(body.reviews).toBeSortedBy("created_at", { descending: true });
             });
         });
         test("Status: 200. Responds with an array of review objects sorted by game owner username descending when input as a valid query", () => {
             return request(app)
-            .get("/api/reviews?sort_by=game_owner")
+            .get("/api/reviews?sort_by=owner")
             .expect(200)
             .then(({ body }) => {
-                expect(body.reviews).toBeSortedBy("game_owner", { descending: true });
+                expect(body.reviews).toBeSortedBy("owner", { descending: true });
             });
         });
         test("Status: 200. Responds with an array of review objects sorted by review id descending when input as a valid query", () => {
@@ -189,10 +189,10 @@ describe("/api/reviews", () => {
         });
         test("Status: 200. Responds with an array of review objects sorted by review game category descending when input as a valid query", () => {
             return request(app)
-            .get("/api/reviews?sort_by=game_category")
+            .get("/api/reviews?sort_by=category")
             .expect(200)
             .then(({ body }) => {
-                expect(body.reviews).toBeSortedBy("game_category", { descending: true });
+                expect(body.reviews).toBeSortedBy("category", { descending: true });
             });
         });
         test("Status: 200. Responds with an array of review objects sorted by comment count descending when input as a valid query", () => {
@@ -225,7 +225,7 @@ describe("/api/reviews", () => {
             .expect(200)
             .then(({ body }) => {
                 const { reviews } = body;
-                expect(body.reviews).toBeSortedBy("review_created_at");
+                expect(body.reviews).toBeSortedBy("created_at");
             });
         });
         test("Status: 200. Responds with an array of review objects sorted by review image url ascending when sort_by and order queries are valid", () => {
@@ -238,18 +238,18 @@ describe("/api/reviews", () => {
         });
         test("Status: 200. Responds with an array of review objects sorted by review votes ascending when sort_by and order queries are valid", () => {
             return request(app)
-            .get("/api/reviews?sort_by=review_votes&order=asc")
+            .get("/api/reviews?sort_by=votes&order=asc")
             .expect(200)
             .then(({ body }) => {
-                expect(body.reviews).toBeSortedBy("review_votes");
+                expect(body.reviews).toBeSortedBy("votes");
             });
         });
         test("Status: 200. Responds with an array of review objects sorted by review title descending when sort_by and order queries are valid", () => {
             return request(app)
-            .get("/api/reviews?sort_by=review_title&order=desc")
+            .get("/api/reviews?sort_by=title&order=desc")
             .expect(200)
             .then(({ body }) => {
-                expect(body.reviews).toBeSortedBy("review_title", { descending: true });
+                expect(body.reviews).toBeSortedBy("title", { descending: true });
             });
         });
         test("Status: 400. Responds with an error message when the order query is invalid", () => {
@@ -270,20 +270,20 @@ describe("/api/reviews", () => {
         });
         test("Status: 200. Responds with an array of review objects that are relevant to the queried category", () => {
             return request(app)
-            .get("/api/reviews?game_category=social deduction")
+            .get("/api/reviews?category=social deduction")
             .expect(200)
             .then(({ body }) => {
                 const { reviews } = body;
                 expect(reviews).toBeInstanceOf(Array);
                 expect(reviews.length).toBe(11);
                 reviews.forEach((reviewObj) => {
-                    expect(reviewObj.game_category).toBe("social deduction");
+                    expect(reviewObj.category).toBe("social deduction");
                 });
             });
         });
         test("Status: 400. Responds with an error message when the category query is not in the database", () => {
             return request(app)
-            .get("/api/reviews?game_category=not_a_category")
+            .get("/api/reviews?category=not_a_category")
             .expect(400)
             .then(({ body }) => {
                 expect(body.msg).toBe("No games match this category");
@@ -291,7 +291,7 @@ describe("/api/reviews", () => {
         });
         test("Status: 200. Responds with an empty array when the category exists but contains no reviews", () => {
             return request(app)
-            .get("/api/reviews?game_category=children's games")
+            .get("/api/reviews?category=children's games")
             .expect(200)
             .then(({ body }) => {
                 expect(body.reviews).toEqual([]);
@@ -352,8 +352,8 @@ describe("/api/reviews/:review_id/comments", () => {
                 const { comment } = body;
                 expect(comment).toBeInstanceOf(Object);
                 expect(Object.keys(comment).length).toBe(6);
-                expect(comment.comment_author).toEqual('philippaclaire9');
-                expect(comment.comment_body).toEqual('Great fun for the fam!')
+                expect(comment.author).toEqual('philippaclaire9');
+                expect(comment.body).toEqual('Great fun for the fam!')
             });
         });
         test("Status: 404. Responds with an error message when the review id is logical but does not exist", () => {
@@ -482,7 +482,7 @@ describe("/api/comments/:comment_id", () => {
                 const { comment } = body;
                 expect(comment).toBeInstanceOf(Object);
                 expect(Object.keys(comment).length).toBe(6);
-                expect(comment.comment_votes).toBe(8);
+                expect(comment.votes).toBe(8);
             });
         });
         test("Status: 404. Responds with an error message when the path is logical but does not exist", () => {
@@ -583,8 +583,8 @@ describe("/api/users/:username", () => {
                 expect(Object.keys(user).length).toBe(3);
                 expect(user).toEqual({
                     username: 'mallionaire',
-                    user_name: 'haz',
-                    user_avatar_url: 'https://www.healthytherapies.com/wp-content/uploads/2016/06/Lime3.jpg'
+                    name: 'haz',
+                    avatar_url: 'https://www.healthytherapies.com/wp-content/uploads/2016/06/Lime3.jpg'
                 });
             });
         });

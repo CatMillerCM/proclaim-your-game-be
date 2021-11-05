@@ -23,7 +23,7 @@ exports.updateReviewVotes = async (id, update) => {
     } 
     const { rows } = await db.query(
         `UPDATE reviews
-        SET review_votes = review_votes + $2
+        SET votes = votes + $2
         WHERE review_id = $1
         RETURNING*;`, [id, inc_votes])
     if (!rows[0]) {
@@ -31,8 +31,8 @@ exports.updateReviewVotes = async (id, update) => {
     } return rows[0];
 }
 
-exports.selectReviews = async (sort_by = "review_created_at", order = "desc", game_category) => {
-    if (!["review_id", "review_title", "review_img_url", "game_category", "game_owner", "review_votes", "review_created_at", "comment_count"].includes(sort_by)) {
+exports.selectReviews = async (sort_by = "created_at", order = "desc", category) => {
+    if (!["review_id", "title", "review_img_url", "category", "owner", "votes", "created_at", "comment_count"].includes(sort_by)) {
         return Promise.reject({ status: 400, msg: "Invalid sort_by query." });
     }
     if (!['asc', 'desc'].includes(order)) {
@@ -41,14 +41,14 @@ exports.selectReviews = async (sort_by = "review_created_at", order = "desc", ga
 
     const queryValues = [];
 
-    let queryStr = `SELECT reviews.review_id, reviews.review_title, reviews.review_img_url, reviews.game_category, reviews.game_owner, reviews.review_votes, reviews.review_created_at, COUNT(comments.review_id)::INT AS comment_count 
+    let queryStr = `SELECT reviews.review_id, reviews.title, reviews.review_img_url, reviews.category, reviews.owner, reviews.votes, reviews.created_at, COUNT(comments.review_id)::INT AS comment_count 
     FROM reviews 
     LEFT JOIN comments
     ON reviews.review_id = comments.review_id `
 
-    if (game_category) {
-        queryValues.push(game_category);
-        queryStr += `WHERE game_category = $1 `;
+    if (category) {
+        queryValues.push(category);
+        queryStr += `WHERE category = $1 `;
     }
     
     queryStr += `GROUP BY reviews.review_id 
@@ -58,7 +58,7 @@ exports.selectReviews = async (sort_by = "review_created_at", order = "desc", ga
 
     if (rows.length === 0) {
         const categoryResult = await db.query(`
-        SELECT * FROM categories WHERE category_slug = $1;`, [game_category]);
+        SELECT * FROM categories WHERE slug = $1;`, [category]);
 
 
         if (categoryResult.rows.length === 0) {
@@ -77,7 +77,7 @@ exports.selectCommentsByReview = async (id) => {
         return Promise.reject({ status: 404, msg: "Review not found." });
     }
     const { rows } = await db.query(`
-    SELECT comment_id, comment_body, comment_author, comment_votes, comment_created_at 
+    SELECT comment_id, body, author, votes, created_at 
     FROM comments 
     WHERE review_id = $1;`, [id]);
     return rows;
@@ -111,7 +111,7 @@ exports.createComment = async (id, commentObj) => {
     }
 
     const { rows } = await db.query(`
-    INSERT INTO comments (comment_author, comment_body, comment_votes, review_id, comment_created_at) 
+    INSERT INTO comments (author, body, votes, review_id, created_at) 
     VALUES ($1, $2, 0, $3, CURRENT_TIMESTAMP) 
     RETURNING *;`, [author, body, id]);
 

@@ -29,7 +29,7 @@ exports.updateCommentVotes = async (id, update) => {
     } 
     const { rows } = await db.query(
         `UPDATE comments
-        SET comment_votes = comment_votes + $2
+        SET votes = votes + $2
         WHERE comment_id = $1
         RETURNING*;`, [id, inc_votes])
     if (!rows[0]) {

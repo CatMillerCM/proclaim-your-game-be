@@ -17,48 +17,48 @@ const seed = (data) => {
       .then(() => {
         return db.query(`
         CREATE TABLE categories (
-          category_slug VARCHAR NOT NULL PRIMARY KEY,
-          category_description TEXT
+          slug VARCHAR NOT NULL PRIMARY KEY,
+          description TEXT
         );`);
       })
       .then(() => {
         return db.query(`
         CREATE TABLE users (
           username VARCHAR NOT NULL PRIMARY KEY,
-          user_name	VARCHAR,
-          user_avatar_url VARCHAR
+          name	VARCHAR NOT NULL,
+          avatar_url VARCHAR
         );`);
       })
       .then(() => {
         return db.query(`
         CREATE TABLE reviews (
           review_id SERIAL PRIMARY KEY,
-          review_title VARCHAR NOT NULL,
+          title VARCHAR NOT NULL,
           review_body	TEXT NOT NULL,
           review_img_url VARCHAR DEFAULT 'https://images.pexels.com/photos/163064/play-stone-network-networked-interactive-163064.jpeg',
-          game_designer VARCHAR,
-          game_category VARCHAR REFERENCES categories(category_slug),
-          game_owner VARCHAR REFERENCES users(username),
-          review_votes INT DEFAULT 0,
-          review_created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+          designer VARCHAR,
+          category VARCHAR REFERENCES categories(slug),
+          owner VARCHAR REFERENCES users(username),
+          votes INT DEFAULT 0,
+          created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
         );`);
       })
       .then(() => {
         return db.query(`
         CREATE TABLE comments (
           comment_id SERIAL PRIMARY KEY,
-          comment_body TEXT NOT NULL,
-          comment_author VARCHAR REFERENCES users(username),
+          body TEXT NOT NULL,
+          author VARCHAR REFERENCES users(username),
           review_id INT REFERENCES reviews(review_id),
-          comment_votes INT DEFAULT 0,
-          comment_created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+          votes INT DEFAULT 0,
+          created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
         );`);
       })
 
 //INPUTS DATA TO TABLES
       .then(() => {
         const categoryStr = format(
-        `INSERT INTO categories (category_slug, category_description) VALUES %L;`,
+        `INSERT INTO categories (slug, description) VALUES %L;`,
         categoryData.map((categoryObj) => {
           return [categoryObj.slug, categoryObj.description];
         }));
@@ -66,7 +66,7 @@ const seed = (data) => {
       })
       .then(() => {
         const userStr = format(
-        `INSERT INTO users (username, user_name, user_avatar_url) VALUES %L;`,
+        `INSERT INTO users (username, name, avatar_url) VALUES %L;`,
         userData.map((userObj) => {
           return [userObj.username, userObj.name, userObj.avatar_url];
         }));
@@ -74,7 +74,7 @@ const seed = (data) => {
       })
       .then(() => {
         const reviewStr = format(
-        `INSERT INTO reviews (review_title, review_body, review_img_url, game_designer, game_category, game_owner, review_votes, review_created_at) VALUES %L;`,
+        `INSERT INTO reviews (title, review_body, review_img_url, designer, category, owner, votes, created_at) VALUES %L;`,
         reviewData.map((reviewObj) => {
           return [reviewObj.title, reviewObj.review_body, reviewObj.review_img_url, reviewObj.designer, reviewObj.category, reviewObj.owner, reviewObj.votes, reviewObj.created_at];
         }));
@@ -82,7 +82,7 @@ const seed = (data) => {
       })
       .then(() => {
         const commentStr = format(
-        `INSERT INTO comments (comment_body, comment_author, review_id, comment_votes, comment_created_at) VALUES %L;`,
+        `INSERT INTO comments (body, author, review_id, votes, created_at) VALUES %L;`,
         commentData.map((commentObj) => {
           return [commentObj.body, commentObj.author, commentObj.review_id, commentObj.votes, commentObj.created_at];
         }));
