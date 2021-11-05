@@ -164,17 +164,30 @@ describe("/api/reviews/:review_id", () => {
         });
     });
     describe("PATCH", () => {
-        test("Status: 201. Responds with a review object with the vote property updated by the input value", () => {
+        test("Status: 200. Responds with a review object with the vote property incremented when the input value is positive", () => {
             const voteUpdate = { inc_votes: 5 };
             return request(app)
             .patch("/api/reviews/2")
             .send(voteUpdate)
-            .expect(201)
+            .expect(200)
             .then(({ body }) => {
                 const { review } = body;
                 expect(review).toBeInstanceOf(Object);
                 expect(Object.keys(review).length).toBe(9);
                 expect(review.votes).toBe(10);
+            });
+        });
+        test("Status: 200. Responds with a review object with the vote property decremented when the input value is negative", () => {
+            const voteUpdate = { inc_votes: -2 };
+            return request(app)
+            .patch("/api/reviews/2")
+            .send(voteUpdate)
+            .expect(200)
+            .then(({ body }) => {
+                const { review } = body;
+                expect(review).toBeInstanceOf(Object);
+                expect(Object.keys(review).length).toBe(9);
+                expect(review.votes).toBe(3);
             });
         });
         test("Status: 404. Responds with an error message when the path is logical but does not exist", () => {
@@ -665,12 +678,25 @@ describe("/api/comments/:comment_id", () => {
         });
     });
     describe("PATCH", () => {
-        test("Status: 201. Responds with a comment object with the vote property updated by the input value", () => {
+        test("Status: 200. Responds with a comment object with the vote property incremented when the input value is positive", () => {
+            const voteUpdate = { inc_votes: 4 };
+            return request(app)
+            .patch("/api/comments/3")
+            .send(voteUpdate)
+            .expect(200)
+            .then(({ body }) => {
+                const { comment } = body;
+                expect(comment).toBeInstanceOf(Object);
+                expect(Object.keys(comment).length).toBe(6);
+                expect(comment.votes).toBe(14);
+            });
+        });
+        test("Status: 200. Responds with a comment object with the vote property decremented when the input value is negative", () => {
             const voteUpdate = { inc_votes: -2 };
             return request(app)
             .patch("/api/comments/3")
             .send(voteUpdate)
-            .expect(201)
+            .expect(200)
             .then(({ body }) => {
                 const { comment } = body;
                 expect(comment).toBeInstanceOf(Object);
