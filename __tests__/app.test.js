@@ -11,10 +11,63 @@ afterAll(() => db.end());
 describe("app", () => {
     test("Status: 404. Responds with an error message when the path does not exist", () => {
         return request(app)
-            .get("/api/not-a-path")
-            .expect(404)
-            .then(({ body }) => {
+        .get("/api/not-a-path")
+        .expect(404)
+        .then(({ body }) => {
             expect(body.msg).toBe("Path not found.");
+        });
+    });
+});
+
+describe("/api", () => {
+    describe("GET", () => {
+        test("Status: 200. Responds with JSON describing all the available endpoints on the API", () => {
+            return request(app)
+            .get("/api")
+            .expect(200)
+            .then(({ body }) => {
+                expect(Object.keys(body["Welcome to this API!"]["Here are the available endpoints:"]).length).toBe(12);
+            });
+        });
+    });
+    describe("PATCH", () => {
+        test("Status: 405. Responds with an error message when the path is not allowed", () => {
+            return request(app)
+            .patch("/api")
+            .expect(405)
+            .then(({ body }) => {
+                expect(body.msg).toBe("Method not allowed.");
+            });
+        });
+    });
+    describe("PUT", () => {
+        test("Status: 405. Responds with an error message when the path is not allowed", () => {
+            return request(app)
+            .put("/api")
+            .expect(405)
+            .then(({ body }) => {
+                expect(body.msg).toBe("Method not allowed.");
+            });
+        });
+    });
+    describe("POST", () => {
+        test("Status: 405. Responds with an error message when the path is not allowed", () => {
+            return request(app)
+            .post("/api")
+            .expect(405)
+            .then(({ body }) => {
+                expect(body.msg).toBe("Method not allowed.");
+            });
+        });
+    });
+    describe("DELETE", () => {
+        test("Status: 405. Responds with an error message when the path is not allowed", () => {
+            return request(app)
+            .delete("/api")
+            .expect(405)
+            .then(({ body }) => {
+                expect(body.msg).toBe("Method not allowed.");
+            });
         });
     });
 });
@@ -35,6 +88,46 @@ describe("/api/categories", () => {
                         slug: expect.any(String)
                     }));
                 });
+            });
+        });
+    });
+    describe("PATCH", () => {
+        test("Status: 405. Responds with an error message when the path is not allowed", () => {
+            return request(app)
+            .patch("/api/categories")
+            .expect(405)
+            .then(({ body }) => {
+                expect(body.msg).toBe("Method not allowed.");
+            });
+        });
+    });
+    describe("PUT", () => {
+        test("Status: 405. Responds with an error message when the path is not allowed", () => {
+            return request(app)
+            .put("/api/categories")
+            .expect(405)
+            .then(({ body }) => {
+                expect(body.msg).toBe("Method not allowed.");
+            });
+        });
+    });
+    describe("POST", () => {
+        test("Status: 405. Responds with an error message when the path is not allowed", () => {
+            return request(app)
+            .post("/api/categories")
+            .expect(405)
+            .then(({ body }) => {
+                expect(body.msg).toBe("Method not allowed.");
+            });
+        });
+    });
+    describe("DELETE", () => {
+        test("Status: 405. Responds with an error message when the path is not allowed", () => {
+            return request(app)
+            .delete("/api/categories")
+            .expect(405)
+            .then(({ body }) => {
+                expect(body.msg).toBe("Method not allowed.");
             });
         });
     });
@@ -132,6 +225,36 @@ describe("/api/reviews/:review_id", () => {
             .expect(422)
             .then(({ body }) => {
                 expect(body.msg).toBe("Invalid patch object.");
+            });
+        });
+    });
+    describe("PUT", () => {
+        test("Status: 405. Responds with an error message when the path is not allowed", () => {
+            return request(app)
+            .put("/api/reviews/2")
+            .expect(405)
+            .then(({ body }) => {
+                expect(body.msg).toBe("Method not allowed.");
+            });
+        });
+    });
+    describe("POST", () => {
+        test("Status: 405. Responds with an error message when the path is not allowed", () => {
+            return request(app)
+            .post("/api/reviews/2")
+            .expect(405)
+            .then(({ body }) => {
+                expect(body.msg).toBe("Method not allowed.");
+            });
+        });
+    });
+    describe("DELETE", () => {
+        test("Status: 405. Responds with an error message when the path is not allowed", () => {
+            return request(app)
+            .delete("/api/reviews/2")
+            .expect(405)
+            .then(({ body }) => {
+                expect(body.msg).toBe("Method not allowed.");
             });
         });
     });
@@ -298,6 +421,46 @@ describe("/api/reviews", () => {
             });
         });
     });
+    describe("PATCH", () => {
+        test("Status: 405. Responds with an error message when the path is not allowed", () => {
+            return request(app)
+            .patch("/api/reviews")
+            .expect(405)
+            .then(({ body }) => {
+                expect(body.msg).toBe("Method not allowed.");
+            });
+        });
+    });
+    describe("PUT", () => {
+        test("Status: 405. Responds with an error message when the path is not allowed", () => {
+            return request(app)
+            .put("/api/reviews")
+            .expect(405)
+            .then(({ body }) => {
+                expect(body.msg).toBe("Method not allowed.");
+            });
+        });
+    });
+    describe("POST", () => {
+        test("Status: 405. Responds with an error message when the path is not allowed", () => {
+            return request(app)
+            .post("/api/reviews")
+            .expect(405)
+            .then(({ body }) => {
+                expect(body.msg).toBe("Method not allowed.");
+            });
+        });
+    });
+    describe("DELETE", () => {
+        test("Status: 405. Responds with an error message when the path is not allowed", () => {
+            return request(app)
+            .delete("/api/reviews")
+            .expect(405)
+            .then(({ body }) => {
+                expect(body.msg).toBe("Method not allowed.");
+            });
+        });
+    });
 });
 
 describe("/api/reviews/:review_id/comments", () => {
@@ -437,6 +600,36 @@ describe("/api/reviews/:review_id/comments", () => {
             });
         });
     });
+    describe("PATCH", () => {
+        test("Status: 405. Responds with an error message when the path is not allowed", () => {
+            return request(app)
+            .patch("/api/reviews/2/comments")
+            .expect(405)
+            .then(({ body }) => {
+                expect(body.msg).toBe("Method not allowed.");
+            });
+        });
+    });
+    describe("PUT", () => {
+        test("Status: 405. Responds with an error message when the path is not allowed", () => {
+            return request(app)
+            .put("/api/reviews/2/comments")
+            .expect(405)
+            .then(({ body }) => {
+                expect(body.msg).toBe("Method not allowed.");
+            });
+        });
+    });
+    describe("DELETE", () => {
+        test("Status: 405. Responds with an error message when the path is not allowed", () => {
+            return request(app)
+            .delete("/api/reviews/2/comments")
+            .expect(405)
+            .then(({ body }) => {
+                expect(body.msg).toBe("Method not allowed.");
+            });
+        });
+    });
 });
 
 describe("/api/comments/:comment_id", () => {
@@ -536,17 +729,34 @@ describe("/api/comments/:comment_id", () => {
             });
         });
     });
-});
-
-describe("/api", () => {
     describe("GET", () => {
-        test("Status: 200. Responds with JSON describing all the available endpoints on the API", () => {
+        test("Status: 405. Responds with an error message when the path is not allowed", () => {
             return request(app)
-                .get("/api")
-                .expect(200)
-                .then(({ body }) => {
-                    expect(Object.keys(body["Welcome to this API!"]["Here are the available endpoints:"]).length).toBe(12);
-                });
+            .get("/api/comments/2")
+            .expect(405)
+            .then(({ body }) => {
+                expect(body.msg).toBe("Method not allowed.");
+            });
+        });
+    });
+    describe("PUT", () => {
+        test("Status: 405. Responds with an error message when the path is not allowed", () => {
+            return request(app)
+            .put("/api/comments/2")
+            .expect(405)
+            .then(({ body }) => {
+                expect(body.msg).toBe("Method not allowed.");
+            });
+        });
+    });
+    describe("POST", () => {
+        test("Status: 405. Responds with an error message when the path is not allowed", () => {
+            return request(app)
+            .post("/api/comments/2")
+            .expect(405)
+            .then(({ body }) => {
+                expect(body.msg).toBe("Method not allowed.");
+            });
         });
     });
 });
@@ -566,6 +776,46 @@ describe("/api/users", () => {
                         username: expect.any(String)
                     }));
                 });
+            });
+        });
+    });
+    describe("PATCH", () => {
+        test("Status: 405. Responds with an error message when the path is not allowed", () => {
+            return request(app)
+            .patch("/api/users")
+            .expect(405)
+            .then(({ body }) => {
+                expect(body.msg).toBe("Method not allowed.");
+            });
+        });
+    });
+    describe("PUT", () => {
+        test("Status: 405. Responds with an error message when the path is not allowed", () => {
+            return request(app)
+            .put("/api/users")
+            .expect(405)
+            .then(({ body }) => {
+                expect(body.msg).toBe("Method not allowed.");
+            });
+        });
+    });
+    describe("POST", () => {
+        test("Status: 405. Responds with an error message when the path is not allowed", () => {
+            return request(app)
+            .post("/api/users")
+            .expect(405)
+            .then(({ body }) => {
+                expect(body.msg).toBe("Method not allowed.");
+            });
+        });
+    });
+    describe("DELETE", () => {
+        test("Status: 405. Responds with an error message when the path is not allowed", () => {
+            return request(app)
+            .delete("/api/users")
+            .expect(405)
+            .then(({ body }) => {
+                expect(body.msg).toBe("Method not allowed.");
             });
         });
     });
@@ -594,6 +844,46 @@ describe("/api/users/:username", () => {
             .expect(404)
             .then(({ body }) => {
                 expect(body.msg).toBe("Username not found.");
+            });
+        });
+    });
+    describe("PATCH", () => {
+        test("Status: 405. Responds with an error message when the path is not allowed", () => {
+            return request(app)
+            .patch("/api/users/mallionaire")
+            .expect(405)
+            .then(({ body }) => {
+                expect(body.msg).toBe("Method not allowed.");
+            });
+        });
+    });
+    describe("PUT", () => {
+        test("Status: 405. Responds with an error message when the path is not allowed", () => {
+            return request(app)
+            .put("/api/users/mallionaire")
+            .expect(405)
+            .then(({ body }) => {
+                expect(body.msg).toBe("Method not allowed.");
+            });
+        });
+    });
+    describe("POST", () => {
+        test("Status: 405. Responds with an error message when the path is not allowed", () => {
+            return request(app)
+            .post("/api/users/mallionaire")
+            .expect(405)
+            .then(({ body }) => {
+                expect(body.msg).toBe("Method not allowed.");
+            });
+        });
+    });
+    describe("DELETE", () => {
+        test("Status: 405. Responds with an error message when the path is not allowed", () => {
+            return request(app)
+            .delete("/api/users/mallionaire")
+            .expect(405)
+            .then(({ body }) => {
+                expect(body.msg).toBe("Method not allowed.");
             });
         });
     });
