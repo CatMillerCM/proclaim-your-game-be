@@ -3,27 +3,18 @@ const db = require("../../db");
 
 exports.selectCommentsByReview = async (id, limit = 10, p = 1) => {
     const reviews = await db.query(`SELECT * FROM reviews WHERE review_id = $1;`, [id])
-    
-    if (reviews.rows.length === 0) {
-        return Promise.reject({ status: 404, msg: "Review not found." });
-    }
+    if (reviews.rows.length === 0) return Promise.reject({ status: 404, msg: "Review not found."});
+
     const { rows } = await db.query(`
     SELECT comment_id, body, author, votes, created_at 
     FROM comments 
     WHERE review_id = $1;`, [id]);
 
-    if (!(limit > 0)) {
-        return Promise.reject({status: 400, msg: "Invalid limit query."});
-    }
-    if (limit > 10) {
-        return Promise.reject({status: 400, msg: "Limit query exceeds maximum of 10."});
-    }
-    if (!(p > 0)) {
-        return Promise.reject({status: 400, msg: "Invalid page query."});
-    }
-    if (p > Math.ceil(rows.length/limit) && rows.length != 0) {
-        return Promise.reject({status: 404, msg: "Page number not found."});
-    }
+    if (!(limit > 0)) return Promise.reject({status: 400, msg: "Invalid limit query."});
+    if (limit > 10) return Promise.reject({status: 400, msg: "Limit query exceeds maximum of 10."});
+    if (!(p > 0)) return Promise.reject({status: 400, msg: "Invalid page query."});
+    if (p > Math.ceil(rows.length/limit) && rows.length != 0) return Promise.reject({status: 404, msg: "Page number not found."});
+
     if (rows.length > limit) {
         const limitedRows = rows.slice((limit * (p-1)), (limit * p)); 
         return limitedRows;
@@ -31,28 +22,19 @@ exports.selectCommentsByReview = async (id, limit = 10, p = 1) => {
     return rows;
 };
 
+
 exports.createComment = async (id, commentObj) => {
+    if (Object.keys(commentObj).length < 2) return Promise.reject({ status: 400, msg: "Invalid post object." });
 
-    if (Object.keys(commentObj).length < 2) {
-        return Promise.reject({ status: 400, msg: "Invalid post object." });
-    }
-    
     const { author, body } = commentObj;
-
     const reviews = await db.query(`SELECT * FROM reviews WHERE review_id = $1;`, [id]);
-    if (reviews.rows.length === 0) {
-        return Promise.reject({ status: 404, msg: "Review not found." });
-    }
 
-    if (typeof author != "string" || typeof body != "string") {
-        return Promise.reject({ status: 400, msg: "Invalid post object." });
-    }
+    if (reviews.rows.length === 0) return Promise.reject({ status: 404, msg: "Review not found." });
+    if (typeof author != "string" || typeof body != "string") return Promise.reject({ status: 400, msg: "Invalid post object." });
 
     const allUsers = await db.query(`SELECT username FROM users;`);
     const usernameArray = allUsers.rows.map((user) => user.username);
-    if (!usernameArray.includes(author)) {
-        return Promise.reject({ status: 404, msg: "Invalid username." });
-    }
+    if (!usernameArray.includes(author)) return Promise.reject({ status: 404, msg: "Invalid username." });
 
     const { rows } = await db.query(`
     INSERT INTO comments (author, body, votes, review_id, created_at) 
@@ -68,18 +50,17 @@ exports.selectComments = async () => {
     return rows;
 };
 
-exports.removeComments = async (id) => {
 
+exports.removeComments = async (id) => {
     const comments = await db.query(`SELECT * FROM comments WHERE comment_id = $1;`, [id])
     
-    if (comments.rows.length === 0) {
-        return Promise.reject({ status: 404, msg: "Comment not found." });
-    }
+    if (comments.rows.length === 0) return Promise.reject({ status: 404, msg: "Comment not found." });
 
     return await db.query(`
     DELETE FROM comments
     WHERE comment_id = $1;`, [id]);
 };
+
 
 exports.updateCommentVotes = async (id, update) => {
     const { inc_votes } = update;
@@ -87,21 +68,18 @@ exports.updateCommentVotes = async (id, update) => {
     if (Object.keys(update).length === 0) {
         const { rows } = await db.query(`SELECT * FROM comments WHERE comment_id = $1;`, [id]);
         return rows[0];
-    }
+    };
 
-    if (typeof inc_votes > "number") {
-        return Promise.reject({ status: 400, msg: "Invalid patch object." });
-    }
-    if (Object.keys(update).length != 1) {
-        return Promise.reject({ status: 422, msg: "Invalid patch object." });
-    } 
+    if (typeof inc_votes > "number") return Promise.reject({ status: 400, msg: "Invalid patch object." });
+    if (Object.keys(update).length != 1) return Promise.reject({ status: 422, msg: "Invalid patch object." });
+
     const { rows } = await db.query(
         `UPDATE comments
         SET votes = votes + $2
         WHERE comment_id = $1
         RETURNING*;`, [id, inc_votes])
-    if (!rows[0]) {
-        return Promise.reject({ status: 404, msg: "Comment not found." });
-    } 
+
+    if (!rows[0]) return Promise.reject({ status: 404, msg: "Comment not found." });
+
     return rows[0];
-}
+};
