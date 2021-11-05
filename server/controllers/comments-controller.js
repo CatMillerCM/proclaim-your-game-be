@@ -2,7 +2,8 @@ const { selectComments, removeComments, updateCommentVotes, selectCommentsByRevi
 
 exports.getCommentsByReview = (req, res, next) => {
     const { review_id } = req.params;
-    selectCommentsByReview(review_id)
+    const { limit, p } = req.query;
+    selectCommentsByReview(review_id, limit, p)
     .then((comments) => {
         res.status(200).send({ comments });
     })

@@ -1,7 +1,7 @@
 const db = require("../../db");
 
 
-exports.selectCommentsByReview = async (id) => {
+exports.selectCommentsByReview = async (id, limit = 10, p = 1) => {
     const reviews = await db.query(`SELECT * FROM reviews WHERE review_id = $1;`, [id])
     
     if (reviews.rows.length === 0) {
@@ -11,6 +11,23 @@ exports.selectCommentsByReview = async (id) => {
     SELECT comment_id, body, author, votes, created_at 
     FROM comments 
     WHERE review_id = $1;`, [id]);
+
+    if (!(limit > 0)) {
+        return Promise.reject({status: 400, msg: "Invalid limit query."});
+    }
+    if (limit > 10) {
+        return Promise.reject({status: 400, msg: "Limit query exceeds maximum of 10."});
+    }
+    if (!(p > 0)) {
+        return Promise.reject({status: 400, msg: "Invalid page query."});
+    }
+    if (p > Math.ceil(rows.length/limit) && rows.length != 0) {
+        return Promise.reject({status: 404, msg: "Page number not found."});
+    }
+    if (rows.length > limit) {
+        const limitedRows = rows.slice((limit * (p-1)), (limit * p)); 
+        return limitedRows;
+    }
     return rows;
 };
 

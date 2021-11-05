@@ -621,6 +621,44 @@ describe("/api/reviews/:review_id/comments", () => {
                 });
             });
         });
+        test("Status: 200. Responds with an array of 2 comment objects when specified in the query", () => {
+            return request(app)
+            .get("/api/reviews/2/comments?limit=2")
+            .expect(200)
+            .then(({ body }) => {
+                const { comments } = body;
+                expect(comments).toBeInstanceOf(Array);
+                expect(comments.length).toBe(2);
+                comments.forEach((commentObj) => {
+                    expect(commentObj).toBeInstanceOf(Object);
+                    expect(Object.keys(commentObj).length).toBe(5);
+                });
+            });
+        });
+        test("Status: 400. Responds with an error message when the limit query is invalid (over 10)", () => {
+            return request(app)
+            .get("/api/reviews/2/comments?limit=20")
+            .expect(400)
+            .then(({ body }) => {
+                expect(body.msg).toBe("Limit query exceeds maximum of 10.");
+            });
+        });
+        test("Status: 400. Responds with an error message when the limit query is invalid (under 0)", () => {
+            return request(app)
+            .get("/api/reviews/2/comments?limit=-4")
+            .expect(400)
+            .then(({ body }) => {
+                expect(body.msg).toBe("Invalid limit query.");
+            });
+        });
+        test("Status: 400. Responds with an error message when the limit query is of an incorrect data type", () => {
+            return request(app)
+            .get("/api/reviews/2/comments?limit=not-a-number")
+            .expect(400)
+            .then(({ body }) => {
+                expect(body.msg).toBe("Invalid limit query.");
+            });
+        });
         test("Status: 404. Responds with an error message when the review id is logical but does not exist", () => {
             return request(app)
             .get("/api/reviews/9999/comments")
@@ -743,6 +781,30 @@ describe("/api/reviews/:review_id/comments", () => {
             .expect(400)
             .then(({ body }) => {
                 expect(body.msg).toBe("Invalid post object.");
+            });
+        });
+        test("Status: 404. Responds with an error message when the page query is logical but does not exist", () => {
+            return request(app)
+            .get("/api/reviews/2/comments?p=999")
+            .expect(404)
+            .then(({ body }) => {
+                expect(body.msg).toBe("Page number not found.");
+            });
+        });
+        test("Status: 400. Responds with an error message when the page query is invalid (under 0)", () => {
+            return request(app)
+            .get("/api/reviews/2/comments?p=-10")
+            .expect(400)
+            .then(({ body }) => {
+                expect(body.msg).toBe("Invalid page query.");
+            });
+        });
+        test("Status: 400. Responds with an error message when the page query is of an incorrect data type", () => {
+            return request(app)
+            .get("/api/reviews/2/comments?p=not-a-number")
+            .expect(400)
+            .then(({ body }) => {
+                expect(body.msg).toBe("Invalid page query.");
             });
         });
     });
