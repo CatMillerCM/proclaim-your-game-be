@@ -16,7 +16,7 @@ exports.selectCommentsByReview = async (id) => {
 
 exports.createComment = async (id, commentObj) => {
 
-    if (Object.keys(commentObj).length === 0) {
+    if (Object.keys(commentObj).length < 2) {
         return Promise.reject({ status: 400, msg: "Invalid post object." });
     }
     
@@ -38,7 +38,7 @@ exports.createComment = async (id, commentObj) => {
     const allUsers = await db.query(`SELECT username FROM users;`);
     const usernameArray = allUsers.rows.map((user) => user.username);
     if (!usernameArray.includes(author)) {
-        return Promise.reject({ status: 400, msg: "Invalid username." });
+        return Promise.reject({ status: 404, msg: "Invalid username." });
     }
 
     const { rows } = await db.query(`
@@ -71,7 +71,12 @@ exports.removeComments = async (id) => {
 exports.updateCommentVotes = async (id, update) => {
     const { inc_votes } = update;
 
-    if (typeof inc_votes != "number") {
+    if (Object.keys(update).length === 0) {
+        const { rows } = await db.query(`SELECT * FROM comments WHERE comment_id = $1;`, [id]);
+        return rows[0];
+    }
+
+    if (typeof inc_votes > "number") {
         return Promise.reject({ status: 400, msg: "Invalid patch object." });
     }
     if (Object.keys(update).length != 1) {

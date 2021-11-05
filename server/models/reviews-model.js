@@ -15,10 +15,14 @@ exports.selectReviewById = async (id) => {
 
 exports.updateReviewVotes = async (id, update) => {
     const { inc_votes } = update;
+    if (Object.keys(update).length === 0) {
+        const { rows } = await db.query(`SELECT * FROM reviews WHERE review_id = $1;`, [id]);
+        return rows[0];
+    }
     if (typeof inc_votes != "number") {
         return Promise.reject({ status: 400, msg: "Invalid patch object." });
     }
-    if (Object.keys(update).length != 1) {
+    if (Object.keys(update).length > 1) {
         return Promise.reject({ status: 422, msg: "Invalid patch object." });
     } 
     const { rows } = await db.query(
@@ -62,7 +66,7 @@ exports.selectReviews = async (sort_by = "created_at", order = "desc", category)
 
 
         if (categoryResult.rows.length === 0) {
-            return Promise.reject({status: 400, msg: "No games match this category",
+            return Promise.reject({status: 404, msg: "Non-existent category.",
             });
         }
     }

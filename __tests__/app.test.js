@@ -190,6 +190,19 @@ describe("/api/reviews/:review_id", () => {
                 expect(review.votes).toBe(3);
             });
         });
+        test("Status: 200. Responds with an unchanged review object when the patch request is an empty object", () => {
+            const voteUpdate = {};
+            return request(app)
+            .patch("/api/reviews/2")
+            .send(voteUpdate)
+            .expect(200)
+            .then(({ body }) => {
+                const { review } = body;
+                expect(review).toBeInstanceOf(Object);
+                expect(Object.keys(review).length).toBe(9);
+                expect(review.votes).toBe(5);
+            });
+        });
         test("Status: 404. Responds with an error message when the path is logical but does not exist", () => {
             const voteUpdate = { inc_votes: 5 };
             return request(app)
@@ -208,16 +221,6 @@ describe("/api/reviews/:review_id", () => {
             .expect(400)
             .then(({ body }) => {
                 expect(body.msg).toBe("Invalid data entry.");
-            });
-        });
-        test("Status: 400. Responds with an error message when the patch request is an empty object", () => {
-            const voteUpdate = {};
-            return request(app)
-            .patch("/api/reviews/2")
-            .send(voteUpdate)
-            .expect(400)
-            .then(({ body }) => {
-                expect(body.msg).toBe("Invalid patch object.");
             });
         });
         test("Status: 400. Responds with an error message when the patch request is of the wrong input type", () => {
@@ -417,12 +420,12 @@ describe("/api/reviews", () => {
                 });
             });
         });
-        test("Status: 400. Responds with an error message when the category query is not in the database", () => {
+        test("Status: 404. Responds with an error message when the category query is not in the database", () => {
             return request(app)
             .get("/api/reviews?category=not_a_category")
-            .expect(400)
+            .expect(404)
             .then(({ body }) => {
-                expect(body.msg).toBe("No games match this category");
+                expect(body.msg).toBe("Non-existent category.");
             });
         });
         test("Status: 200. Responds with an empty array when the category exists but contains no reviews", () => {
@@ -521,7 +524,7 @@ describe("/api/reviews/:review_id/comments", () => {
         test("Status: 201. Responds with a comment object with the relevant properties", () => {
             const newComment = {author: 'philippaclaire9', body: 'Great fun for the fam!'}
             return request(app)
-            .post("/api/reviews/2/comments")
+            .post("/api/reviews/1/comments")
             .send(newComment)
             .expect(201)
             .then(({ body }) => {
@@ -582,12 +585,12 @@ describe("/api/reviews/:review_id/comments", () => {
                 expect(body.msg).toBe("Invalid post object.");
             });
         });
-        test("Status: 400. Responds with an error message when the post request specifies a username that does not exist", () => {
+        test("Status: 404. Responds with an error message when the post request specifies a username that does not exist", () => {
             const newComment = {author: 'user-does-not-exist', body: 'Great fun for the fam!'}
             return request(app)
             .post("/api/reviews/2/comments")
             .send(newComment)
-            .expect(400)
+            .expect(404)
             .then(({ body }) => {
                 expect(body.msg).toBe("Invalid username.");
             });
@@ -602,12 +605,12 @@ describe("/api/reviews/:review_id/comments", () => {
                 expect(body.msg).toBe("Invalid post object.");
             });
         });
-        test("Status: 422. Responds with an error message when the post request does not have both properties", () => {
+        test("Status: 400. Responds with an error message when the post request does not have both properties", () => {
             const newComment = {author: 'philippaclaire9'}
             return request(app)
             .post("/api/reviews/2/comments")
             .send(newComment)
-            .expect(422)
+            .expect(400)
             .then(({ body }) => {
                 expect(body.msg).toBe("Invalid post object.");
             });
@@ -704,6 +707,19 @@ describe("/api/comments/:comment_id", () => {
                 expect(comment.votes).toBe(8);
             });
         });
+        test("Status: 200. Responds with an unchanged comment object when the patch request is an empty object", () => {
+            const voteUpdate = {};
+            return request(app)
+            .patch("/api/comments/3")
+            .send(voteUpdate)
+            .expect(200)
+            .then(({ body }) => {
+                const { comment } = body;
+                expect(comment).toBeInstanceOf(Object);
+                expect(Object.keys(comment).length).toBe(6);
+                expect(comment.votes).toBe(10);
+            });
+        });
         test("Status: 404. Responds with an error message when the path is logical but does not exist", () => {
             const voteUpdate = { inc_votes: 5 };
             return request(app)
@@ -722,16 +738,6 @@ describe("/api/comments/:comment_id", () => {
             .expect(400)
             .then(({ body }) => {
                 expect(body.msg).toBe("Invalid data entry.");
-            });
-        });
-        test("Status: 400. Responds with an error message when the patch request is an empty object", () => {
-            const voteUpdate = {};
-            return request(app)
-            .patch("/api/comments/2")
-            .send(voteUpdate)
-            .expect(400)
-            .then(({ body }) => {
-                expect(body.msg).toBe("Invalid patch object.");
             });
         });
         test("Status: 400. Responds with an error message when the patch request is of the wrong input type", () => {
