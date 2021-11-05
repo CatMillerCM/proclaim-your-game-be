@@ -27,6 +27,7 @@ const endpoints = {
                 "description": "serves an array of all reviews",
                 "queries": ["category", "sort_by", "order"],
                 "exampleResponse": {
+                    "total_count": 13,
                     "reviews": [
                         {
                         "title": "One Night Ultimate Werewolf",
