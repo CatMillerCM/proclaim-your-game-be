@@ -276,16 +276,32 @@ describe("/api/reviews/:review_id", () => {
     });
 });
 
+///////////////////////////////////////////////
 describe("/api/reviews", () => {
     describe("GET", () => {
-        test("Status: 200. Responds with an array of review objects", () => {
+        test("Status: 200. Responds with an array of 10 review objects by default", () => {
             return request(app)
             .get("/api/reviews")
             .expect(200)
             .then(({ body }) => {
                 const { reviews } = body;
                 expect(reviews).toBeInstanceOf(Array);
-                expect(reviews.length).toBe(13);
+                expect(reviews.length).toBe(10);
+                reviews.forEach((reviewObj) => {
+                    expect(reviewObj).toBeInstanceOf(Object);
+                    expect(Object.keys(reviewObj).length).toBe(8);
+                    expect(reviewObj.hasOwnProperty("comment_count")).toBe(true);
+                });
+            });
+        });
+        test("Status: 200. Responds with an array of 5 review objects when specified in the query", () => {
+            return request(app)
+            .get("/api/reviews?limit=5")
+            .expect(200)
+            .then(({ body }) => {
+                const { reviews } = body;
+                expect(reviews).toBeInstanceOf(Array);
+                expect(reviews.length).toBe(5);
                 reviews.forEach((reviewObj) => {
                     expect(reviewObj).toBeInstanceOf(Object);
                     expect(Object.keys(reviewObj).length).toBe(8);
@@ -340,6 +356,30 @@ describe("/api/reviews", () => {
             .expect(200)
             .then(({ body }) => {
                 expect(body.reviews).toBeSortedBy("comment_count", { descending: true });
+            });
+        });
+        test("Status: 400. Responds with an error message when the limit query is invalid (over 10)", () => {
+            return request(app)
+            .get("/api/reviews?limit=20")
+            .expect(400)
+            .then(({ body }) => {
+                expect(body.msg).toBe("Limit query exceeds maximum of 10.");
+            });
+        });
+        test("Status: 400. Responds with an error message when the limit query is invalid (under 0)", () => {
+            return request(app)
+            .get("/api/reviews?limit=-4")
+            .expect(400)
+            .then(({ body }) => {
+                expect(body.msg).toBe("Invalid limit query.");
+            });
+        });
+        test("Status: 400. Responds with an error message when the limit query is of an incorrect data type", () => {
+            return request(app)
+            .get("/api/reviews?limit=not-a-number")
+            .expect(400)
+            .then(({ body }) => {
+                expect(body.msg).toBe("Invalid limit query.");
             });
         });
         test("Status: 400. Responds with an error message when the sort_by query is invalid", () => {
@@ -407,17 +447,82 @@ describe("/api/reviews", () => {
                 expect(body.msg).toBe("Invalid order query.");
             });
         });
-        test("Status: 200. Responds with an array of review objects that are relevant to the queried category", () => {
+        test("Status: 200. Responds with an array of review objects that are relevant to the queried category with a default limit of 10 starting at page 1 by default", () => {
             return request(app)
             .get("/api/reviews?category=social deduction")
             .expect(200)
             .then(({ body }) => {
                 const { reviews } = body;
                 expect(reviews).toBeInstanceOf(Array);
-                expect(reviews.length).toBe(11);
+                expect(reviews.length).toBe(10);
                 reviews.forEach((reviewObj) => {
                     expect(reviewObj.category).toBe("social deduction");
                 });
+            });
+        });
+        test("Status: 200. Responds with an array of review objects that are relevant to the queried category with a default limit of 10 starting at page 2", () => {
+            return request(app)
+            .get("/api/reviews?p=2&category=social deduction")
+            .expect(200)
+            .then(({ body }) => {
+                const { reviews } = body;
+                expect(reviews).toBeInstanceOf(Array);
+                expect(reviews.length).toBe(1);
+                reviews.forEach((reviewObj) => {
+                    expect(reviewObj.category).toBe("social deduction");
+                });
+                expect(reviews[0].title).toBe("Settlers of Catan: Don't Settle For Less")
+            });
+        });
+        test("Status: 200. Responds with an array of review objects that are relevant to the queried category with a limit of 3 starting at page 1 by default", () => {
+            return request(app)
+            .get("/api/reviews?category=social deduction&limit=3")
+            .expect(200)
+            .then(({ body }) => {
+                const { reviews } = body;
+                expect(reviews).toBeInstanceOf(Array);
+                expect(reviews.length).toBe(3);
+                reviews.forEach((reviewObj) => {
+                    expect(reviewObj.category).toBe("social deduction");
+                });
+            });
+        });
+        test("Status: 200. Responds with an array of review objects that are relevant to the queried category with a limit of 3 starting at page 3", () => {
+            return request(app)
+            .get("/api/reviews?p=3&category=social deduction&limit=3")
+            .expect(200)
+            .then(({ body }) => {
+                const { reviews } = body;
+                expect(reviews).toBeInstanceOf(Array);
+                expect(reviews.length).toBe(3);
+                reviews.forEach((reviewObj) => {
+                    expect(reviewObj.category).toBe("social deduction");
+                });
+                expect(reviews[0].title).toBe('That\'s just what an evil person would say!')
+            });
+        });
+        test("Status: 404. Responds with an error message when the page query is logical but does not exist", () => {
+            return request(app)
+            .get("/api/reviews?p=999")
+            .expect(404)
+            .then(({ body }) => {
+                expect(body.msg).toBe("Page number not found.");
+            });
+        });
+        test("Status: 400. Responds with an error message when the page query is invalid (under 0)", () => {
+            return request(app)
+            .get("/api/reviews?p=-10")
+            .expect(400)
+            .then(({ body }) => {
+                expect(body.msg).toBe("Invalid page query.");
+            });
+        });
+        test("Status: 400. Responds with an error message when the page query is of an incorrect data type", () => {
+            return request(app)
+            .get("/api/reviews?p=not-a-number")
+            .expect(400)
+            .then(({ body }) => {
+                expect(body.msg).toBe("Invalid page query.");
             });
         });
         test("Status: 404. Responds with an error message when the category query is not in the database", () => {

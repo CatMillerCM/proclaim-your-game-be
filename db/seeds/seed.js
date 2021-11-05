@@ -12,7 +12,6 @@ const seed = (data) => {
 
 //DROPS TABLES IF EXIST
     dropCommentsTable()
-      //db.query(`DROP TABLE IF EXISTS comments;`)
       .then(dropReviewsTable)
       .then(dropUsersTable)
       .then(dropCategoriesTable)

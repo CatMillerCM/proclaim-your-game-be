@@ -35,7 +35,7 @@ exports.updateReviewVotes = async (id, update) => {
     } return rows[0];
 }
 
-exports.selectReviews = async (sort_by = "created_at", order = "desc", category) => {
+exports.selectReviews = async (sort_by = "created_at", order = "desc", category, limit = 10, p = 1) => {
     if (!["review_id", "title", "review_img_url", "category", "owner", "votes", "created_at", "comment_count"].includes(sort_by)) {
         return Promise.reject({ status: 400, msg: "Invalid sort_by query." });
     }
@@ -66,9 +66,24 @@ exports.selectReviews = async (sort_by = "created_at", order = "desc", category)
 
 
         if (categoryResult.rows.length === 0) {
-            return Promise.reject({status: 404, msg: "Non-existent category.",
-            });
+            return Promise.reject({status: 404, msg: "Non-existent category."});
         }
+    }
+    if (!(limit > 0)) {
+        return Promise.reject({status: 400, msg: "Invalid limit query."});
+    }
+    if (limit > 10) {
+        return Promise.reject({status: 400, msg: "Limit query exceeds maximum of 10."});
+    }
+    if (!(p > 0)) {
+        return Promise.reject({status: 400, msg: "Invalid page query."});
+    }
+    if (p > Math.ceil(rows.length/limit) && rows.length != 0) {
+        return Promise.reject({status: 404, msg: "Page number not found."});
+    }
+    if (rows.length > limit) {
+        const limitedRows = rows.slice((limit * (p-1)), (limit * p)); 
+        return limitedRows;
     }
     return rows;
 };
