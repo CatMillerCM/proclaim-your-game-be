@@ -276,7 +276,6 @@ describe("/api/reviews/:review_id", () => {
     });
 });
 
-///////////////////////////////////////////////
 describe("/api/reviews", () => {
     describe("GET", () => {
         test("Status: 200. Responds with an array of 10 review objects by default", () => {
@@ -539,6 +538,28 @@ describe("/api/reviews", () => {
             .expect(200)
             .then(({ body }) => {
                 expect(body.reviews).toEqual([]);
+            });
+        });
+        test("Status: 200. Responds with an array of 10 review objects by default, and has a total count property", () => {
+            return request(app)
+            .get("/api/reviews")
+            .expect(200)
+            .then(({ body }) => {
+                const { reviews } = body;
+                expect(reviews).toBeInstanceOf(Array);
+                const { total_count } = body;
+                expect(total_count).toBe(13);
+            });
+        });
+        test("Status: 200. Responds with an array of review objects that are relevant to the queried category with a limit of 3 starting at page 3, and has a total count property", () => {
+            return request(app)
+            .get("/api/reviews?p=3&category=social deduction&limit=3")
+            .expect(200)
+            .then(({ body }) => {
+                const { reviews } = body;
+                expect(reviews).toBeInstanceOf(Array);
+                const { total_count } = body;
+                expect(total_count).toBe(11);
             });
         });
     });

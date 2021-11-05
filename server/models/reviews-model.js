@@ -83,7 +83,7 @@ exports.selectReviews = async (sort_by = "created_at", order = "desc", category,
     }
     if (rows.length > limit) {
         const limitedRows = rows.slice((limit * (p-1)), (limit * p)); 
-        return limitedRows;
+        return { total_count: rows.length, reviews: limitedRows };
     }
-    return rows;
+    return { total_count: rows.length, reviews: rows };
 };
