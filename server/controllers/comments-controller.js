@@ -1,4 +1,23 @@
-const { selectComments, removeComments, updateCommentVotes } = require("../models/comments-model");
+const { selectComments, removeComments, updateCommentVotes, selectCommentsByReview, createComment } = require("../models/comments-model");
+
+exports.getCommentsByReview = (req, res, next) => {
+    const { review_id } = req.params;
+    selectCommentsByReview(review_id)
+    .then((comments) => {
+        res.status(200).send({ comments });
+    })
+    .catch(next);
+};
+
+exports.postComment = (req, res, next) => {
+    const { review_id } = req.params;
+    const commentObj = req.body;
+    createComment(review_id, commentObj)
+    .then((comment) => {
+        res.status(201).send({ comment });
+    })
+    .catch(next);
+};
 
 exports.getComments = (req, res, next) => {
     selectComments()
