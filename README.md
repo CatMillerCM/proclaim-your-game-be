@@ -38,10 +38,8 @@ touch .env.development
 Followed by:
 
 ```bash
-echo "PGDATABASE=DATABASE_NAME_HERE" > .env.development
+echo "PGDATABASE=nc_games" > .env.development
 ```
-
-Here DATABASE_NAME_HERE refers to the databases outlined in the setup file that we will be accessing.
 
 This populates the file with the associated database name.
 
@@ -54,7 +52,7 @@ touch .env.test
 Followed by:
 
 ```bash
-echo "PGDATABASE=DATABASE_NAME_HERE_test" > .env.test
+echo "PGDATABASE=nc_games_test" > .env.test
 ```
 
 
